@@ -16,17 +16,51 @@ window.ToDoList = {
             method: 'POST',
             contentType: 'application/json',
             data: JSON.stringify(requestBody)
-        }).done( function (response){
-           console.log(response);
+        }).done( function (){
+            ToDoList.getTasks();
         });
     },
 
+    getTasks: function () {
+        $.ajax({
+            url: ToDoList.API_URL
+        }).done( function (response){
+            ToDoList.displayTasks(JSON.parse(response));
+        });
+    },
+
+    displayTasks: function (tasks) {
+        let rowsHtml = '';
+
+        tasks.forEach(task => rowsHtml += ToDoList.getTaskRowHtml(task));
+
+        $('#tasks-table tbody').html(rowsHtml);
+    },
+
+    getTaskRowHtml: function (task) {
+        return `
+                <tr>
+                <td>${task.description}</td>
+                <td>${task.deadline}</td>
+                <td>
+                    <input type="checkbox" class="mark-done" data-id=1>
+                </td>
+                <td>
+                    <a href="#" class="remove-task" data-id=1>
+                        <i class="fa fa-trash"></i>
+                    </a>
+                </td>
+            </tr>`
+    },
+
     bindEvents: function () {
-        $('#create-task-from').submit(function () {
+        $('#create-task-from').submit(function (event) {
+            event.preventDefault();
             ToDoList.createTask();
         });
     }
 
 };
 
+ToDoList.getTasks();
 ToDoList.bindEvents();
